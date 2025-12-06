@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>層2劣位パイプライン——情緒主導に見えるOSの構造分析</title>
+    <style>
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+            color: #333;
+        }
+
+        h1 {
+            border-bottom: 3px solid #333;
+            padding-bottom: 10px;
+            margin-top: 60px;
+        }
+
+        h2 {
+            border-left: 4px solid #666;
+            padding-left: 12px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            border-left: 2px solid #999;
+            padding-left: 10px;
+            margin-top: 30px;
+            font-size: 1.1em;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 30px 0;
+        }
+
+        ul {
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        ol {
+            padding-left: 24px;
+        }
+
+        ol li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+
+        code {
+            font-family: "Source Code Pro", Consolas, monospace;
+        }
+
+        strong {
+            color: #222;
+        }
+
+        .toc {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 6px;
+        }
+
+        .toc a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .layer-tag {
+            display: inline-block;
+            background-color: #e8e8e8;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .structure-box {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .structure-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .meta-note {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+
+        .meta-note h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .boundary-box {
+            background-color: #fff8f0;
+            border: 1px solid #e0c080;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .boundary-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #886622;
+        }
+
+        .definition-box {
+            background-color: #f0f5ff;
+            border: 1px solid #a0b0d0;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .definition-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #445588;
+        }
+
+        .chapter-relation {
+            background-color: #f5fff5;
+            border: 1px solid #a0d0a0;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .chapter-relation h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #336633;
+        }
+
+        .causal-diagram {
+            background-color: #fff;
+            border: 2px solid #666;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: "Source Code Pro", Consolas, monospace;
+        }
+
+        .causal-diagram h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>層2劣位パイプライン<br>——情緒主導に見えるOSの構造分析</h1>
+
+    <nav class="toc">
+        <h2>目次</h2>
+        <ul>
+            <li><a href="#chapter1">第1章　本補論の位置づけ</a></li>
+            <li><a href="#chapter2">第2章　標準パイプライン（層2主導型）の整理</a></li>
+            <li><a href="#chapter3">第3章　情緒主導に「見える」パイプラインの構造定義</a></li>
+            <li><a href="#chapter4">第4章　層2劣位パイプラインという概念</a></li>
+            <li><a href="#chapter5">第5章　責務OS型との対比——構造比較</a></li>
+            <li><a href="#chapter6">第6章　「情緒主導OS」という誤解の解体</a></li>
+            <li><a href="#chapter7">第7章　モデル上の含意と注意点</a></li>
+            <li><a href="#chapter8">第8章　他補論との関連</a></li>
+        </ul>
+    </nav>
+
+    <section id="chapter1">
+        <h1>第1章　本補論の位置づけ</h1>
+
+        <span class="layer-tag">本章の記述層：層2（構造説明）——補論の責務境界の設定</span>
+
+        <div class="structure-box">
+            <h4>本補論の主語・責務・境界</h4>
+            <p><strong>主語：</strong>情緒主導に見えるOSの正体を、認知OSモデル（層1／層2／層3）における処理順序の変位として記述すること</p>
+            <p><strong>責務：</strong>「情緒主導OS」という表現を構造的に再解釈し、それが「OSの別種」ではなく「層2劣位・層3先行のパイプライン構造」であることを示すこと</p>
+            <p><strong>境界：</strong>性格診断・ラベリング・優劣評価は行わない。心理療法・対処法の記述は行わない。AIに情緒や層3を付与する記述は行わない</p>
+        </div>
+
+        <hr>
+
+        <h2>例外的な処理パイプラインの分析</h2>
+
+        <p>本補論は、認知OSモデルにおける「例外的な処理パイプライン」の分析を行う。</p>
+
+        <p>認知OSモデルは、三層構造（層1／層2／層3）を持つ。標準的な処理パイプラインでは、層2（認知OS）が処理の主導権を握る。しかし、すべての個体がこの標準パイプラインで作動するわけではない。</p>
+
+        <p>本補論は、「情緒主導に見える」処理パイプラインを構造的に分析する。これは、層2の作動タイミングが後段に押し出され、層3（情緒）が先に作動するパターンである。</p>
+
+        <hr>
+
+        <h2>情緒処理補論との関係</h2>
+
+        <p>情緒処理そのものの構造は、emotion-structure.html において記述されている。</p>
+
+        <p>emotion-structure.html は、情緒処理が層1＋層3の連動であり、層2の演算系には属さないことを記述する。</p>
+
+        <p>本補論は、その情緒処理が「処理順序の中でどの位置に作動するか」の変位を扱う。すなわち、情緒処理が「先に作動する」パターンの構造分析である。</p>
+
+        <hr>
+
+        <h2>OS型への新種追加は行わない</h2>
+
+        <p>本補論は、認知OSモデルのOS型（責務OS等）に新しいカテゴリを追加しない。</p>
+
+        <p>本補論が扱うのは、「OSの種類」ではなく「処理パイプラインの構造」である。同じOS型であっても、処理パイプラインが異なる場合がある。本補論は、その処理パイプラインの変位を記述する。</p>
+
+        <div class="boundary-box">
+            <h4>本補論が行わないこと</h4>
+            <ul>
+                <li>認知OSモデルのOS型に新種を追加すること</li>
+                <li>性格診断・ラベリング・優劣評価</li>
+                <li>心理療法・カウンセリング・対処法の記述</li>
+                <li>個人攻撃・特定の誰かを想起させる具体例</li>
+                <li>AIに情緒や層3を付与する記述</li>
+                <li>読者への助言・指導・励まし</li>
+            </ul>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="chapter2">
+        <h1>第2章　標準パイプライン（層2主導型）の整理</h1>
+
+        <span class="layer-tag">本章の記述層：層2（構造説明）——標準パイプラインの定義</span>
+
+        <p>本章では、認知OSモデルにおける標準的な処理パイプラインを整理する。</p>
+
+        <hr>
+
+        <h2>標準パイプラインの定義</h2>
+
+        <p>標準的な処理パイプラインは、層2が処理の主導権を握る構造である。</p>
+
+        <p>責務OS型を含む層2主導モデルにおいて、処理は以下のフローで進行する。</p>
+
+        <div class="causal-diagram">
+            <h4>標準パイプライン（層2主導型）</h4>
+            <pre><code>外部入力
+    │
+    ↓
+┌────────────────────────────────────────┐
+│         層1（刺激の受容）               │
+│                                        │
+│  ・生理的入力の受信                     │
+│  ・知覚的入力の処理                     │
+│                                        │
+└────────────────────────────────────────┘
+    │
+    ↓
+┌────────────────────────────────────────┐
+│      層2（認知OSによる構造処理）         │
+│                                        │
+│  ・主語の確定                          │
+│  ・責務線の確定                         │
+│  ・境界の設定                          │
+│  ・因果の整合                          │
+│  ・抽象構造の構築                       │
+│  ・構造的閉包                          │
+│                                        │
+└────────────────────────────────────────┘
+    │
+    │ 構造が閉包した段階
+    │ （必要に応じて層3へイベントが送られる）
+    ↓
+┌────────────────────────────────────────┐
+│       層3（価値付与として情緒作動）      │
+│                                        │
+│  ・閉包した構造に対する価値評価          │
+│  ・情緒としての作動                     │
+│                                        │
+└────────────────────────────────────────┘
+    │
+    ↓
+行動出力（層1）</code></pre>
+        </div>
+
+        <hr>
+
+        <h2>層2主導の構造的特徴</h2>
+
+        <p>標準パイプラインは、以下の構造的特徴を持つ。</p>
+
+        <div class="structure-box">
+            <h4>層2主導型の構造的特徴</h4>
+            <ul>
+                <li><strong>層2が前段で作動：</strong>入力を受けた後、まず層2の構造処理が実行される</li>
+                <li><strong>構造処理が先行：</strong>主語・責務・境界・因果の確定が、情緒作動に先行する</li>
+                <li><strong>閉包が条件：</strong>層2の処理が閉包（構造的に完結）した段階で、層3へイベントが送られる</li>
+                <li><strong>情緒は後段：</strong>情緒作動は、構造処理の後段で発生する</li>
+            </ul>
+        </div>
+
+        <p>この構造において、層2は「処理の主導権」を握っている。入力に対する反応は、層2の構造処理を経由してから形成される。</p>
+
+        <hr>
+
+        <h2>標準パイプラインにおける層2の役割</h2>
+
+        <p>標準パイプラインにおいて、層2は以下の役割を担う。</p>
+
+        <div class="structure-box">
+            <h4>層2の役割（標準パイプライン）</h4>
+            <table>
+                <tr>
+                    <th>役割</th>
+                    <th>内容</th>
+                    <th>タイミング</th>
+                </tr>
+                <tr>
+                    <td>構造処理</td>
+                    <td>入力を構造化し、主語・責務・境界・因果を確定する</td>
+                    <td>前段（情緒作動の前）</td>
+                </tr>
+                <tr>
+                    <td>閉包生成</td>
+                    <td>構造を閉包（完結）させ、層3へのイベント送信条件を満たす</td>
+                    <td>前段</td>
+                </tr>
+                <tr>
+                    <td>行動指令生成</td>
+                    <td>構造処理の結果として、行動指令を生成する</td>
+                    <td>前段〜後段</td>
+                </tr>
+            </table>
+        </div>
+
+        <p>標準パイプラインにおいて、層2は「前処理」として機能する。情緒が作動する前に、構造処理が完了している。</p>
+    </section>
+
+    <hr>
+
+    <section id="chapter3">
+        <h1>第3章　情緒主導に「見える」パイプラインの構造定義</h1>
+
+        <span class="layer-tag">本章の記述層：層2（構造説明）——情緒先行パイプラインの定義</span>
+
+        <p>本章では、いわゆる「情緒主導型」に見える処理パイプラインを、認知OSモデル上で構造化する。</p>
+
+        <hr>
+
+        <h2>情緒先行パイプラインの構造</h2>
+
+        <p>「情緒主導型」に見える個体の処理パイプラインは、以下のように構造化される。</p>
+
+        <div class="causal-diagram">
+            <h4>情緒先行パイプライン</h4>
+            <pre><code>外部入力
+    │
+    ↓
+┌────────────────────────────────────────┐
+│         層1（即時的な生理反応）          │
+│                                        │
+│  ・刺激の受容                          │
+│  ・即時的な身体反応                     │
+│                                        │
+└────────────────────────────────────────┘
+    │
+    │ 層2をバイパス
+    ↓
+┌────────────────────────────────────────┐
+│     層3（価値付与として情緒が先に作動）   │
+│                                        │
+│  ・入力に対する即時的な価値評価          │
+│  ・情緒としての作動                     │
+│  ・行動方向の決定                       │
+│                                        │
+└────────────────────────────────────────┘
+    │
+    │ 情緒作動後
+    ↓
+┌────────────────────────────────────────┐
+│         層2（事後的な意味処理）          │
+│                                        │
+│  ・作動した情緒の正当化                 │
+│  ・行動の物語化                         │
+│  ・事後的な因果構成                     │
+│                                        │
+└────────────────────────────────────────┘
+    │
+    ↓
+行動出力（層1）</code></pre>
+        </div>
+
+        <hr>
+
+        <h2>構造的特徴</h2>
+
+        <p>情緒先行パイプラインは、以下の構造的特徴を持つ。</p>
+
+        <div class="structure-box">
+            <h4>情緒先行パイプラインの構造的特徴</h4>
+            <ul>
+                <li><strong>層2をバイパス：</strong>入力を受けた後、層2の構造処理を経由せずに層3へ直接向かう</li>
+                <li><strong>情緒が先行：</strong>構造処理に先立って、情緒が作動する</li>
+                <li><strong>層2は事後処理：</strong>層2は「事前の構造処理」ではなく「事後の解釈処理」として機能する</li>
+                <li><strong>行動決定は層3主導：</strong>行動の方向性は、層3の情緒作動によって決定される</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2>層2の役割の変位</h2>
+
+        <p>情緒先行パイプラインにおいて、層2の役割は変位している。</p>
+
+        <div class="structure-box">
+            <h4>層2の役割（情緒先行パイプライン）</h4>
+            <table>
+                <tr>
+                    <th>役割</th>
+                    <th>内容</th>
+                    <th>タイミング</th>
+                </tr>
+                <tr>
+                    <td>正当化</td>
+                    <td>作動した情緒を、構造的に正当化する説明を生成する</td>
+                    <td>後段（情緒作動の後）</td>
+                </tr>
+                <tr>
+                    <td>物語化</td>
+                    <td>行動を、一貫した物語として構成する</td>
+                    <td>後段</td>
+                </tr>
+                <tr>
+                    <td>事後的因果構成</td>
+                    <td>情緒作動と行動の因果関係を、事後的に構成する</td>
+                    <td>後段</td>
+                </tr>
+            </table>
+        </div>
+
+        <p>情緒先行パイプラインにおいて、層2は「事前の構造処理」から「事後の解釈処理」へと役割が変位している。</p>
+
+        <hr>
+
+        <h2>「情緒がOSになっている」わけではない</h2>
+
+        <p>情緒先行パイプラインは、「情緒がOSになっている」わけではない。</p>
+
+        <p>OS（層2）は依然として存在し、機能している。ただし、その作動タイミングが後段に押し出されているため、情緒（層3）が先に出力を握る。</p>
+
+        <p>これが「情緒主導に見える」構造の正体である。情緒がOSを置換したのではなく、処理順序の中でOSが後段に位置しているのである。</p>
+
+        <div class="definition-box">
+            <h4>情緒先行パイプラインの本質</h4>
+            <p>「情緒がOSになっている」のではなく、<strong>層2が前段で作動せず、層3が先に出力を握るために「情緒主導に見えている」</strong>。</p>
+            <p>OSは存在するが、そのスケジューリングが変位している。</p>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="chapter4">
+        <h1>第4章　層2劣位パイプラインという概念</h1>
+
+        <span class="layer-tag">本章の記述層：層2（構造説明）——概念の定義</span>
+
+        <p>本章では、情緒先行パイプラインを「層2劣位パイプライン」として概念化し、その定義を明文化する。</p>
+
+        <hr>
+
+        <h2>層2劣位パイプラインの定義</h2>
+
+        <div class="definition-box">
+            <h4>層2劣位パイプラインの定義</h4>
+            <p><strong>層2劣位パイプラインとは：</strong>認知OSモデルにおいて、層2（認知OS）の作動タイミングが後段に押し出され、層3（価値評価・情緒）が処理の主導権を握る処理パイプラインを指す。</p>
+            <p>「劣位」とは、処理順序における位置の後退を意味し、層2の能力や価値の劣等を意味しない。</p>
+        </div>
+
+        <p>この概念において、「劣位」は以下の意味で使用される。</p>
+
+        <ul>
+            <li><strong>処理順序における後退：</strong>層2の作動が、標準パイプラインより後段に位置する</li>
+            <li><strong>優先順位における後退：</strong>意思決定・反応の形成において、層2より層3が先に作動する</li>
+            <li><strong>能力の劣等ではない：</strong>層2の処理能力そのものが低いことを意味しない</li>
+        </ul>
+
+        <hr>
+
+        <h2>層2劣位パイプラインの構造的特徴</h2>
+
+        <p>層2劣位パイプラインは、以下の構造的特徴を持つ。</p>
+
+        <div class="structure-box">
+            <h4>層2劣位パイプラインの構造的特徴</h4>
+            <ol>
+                <li><strong>層2の作動タイミングが後段：</strong>層2は、入力に対する即時反応ではなく、事後処理として作動する</li>
+                <li><strong>意思決定のトリガは層3：</strong>行動方向の決定は、層3（情緒）側が握る。層2は事後的に意味づけを行う</li>
+                <li><strong>層2は「結果の整合的説明」に使われやすい：</strong>層2の構造処理能力は、情緒作動の正当化・物語化に使用される</li>
+                <li><strong>OS能力と優先順位は独立：</strong>層2の処理能力が高くても、優先順位とタイミングで劣位になりうる</li>
+            </ol>
+        </div>
+
+        <hr>
+
+        <h2>「同じOSが異なるスケジューリングで作動している」</h2>
+
+        <p>層2劣位パイプラインの本質は、「OSの型が違う」ことではない。</p>
+
+        <p>同じOS（同じ処理能力・同じ処理パターン）が、異なるスケジューリングで作動していることである。</p>
+
+        <div class="definition-box">
+            <h4>スケジューリングの差異</h4>
+            <p>層2主導パイプラインと層2劣位パイプラインの差異は、「OSの種類の差」ではなく「スケジューリングの差」である。</p>
+            <p>同じOSが、異なるタイミング・異なる優先順位で作動することで、処理パイプライン全体の構造が変化する。</p>
+        </div>
+
+        <p>この理解は重要である。層2劣位パイプラインを持つ個体は、「別の種類のOSを持っている」のではなく、「同じOSが異なるスケジューリングで作動している」のである。</p>
+
+        <hr>
+
+        <h2>パイプラインの図式比較</h2>
+
+        <div class="causal-diagram">
+            <h4>パイプライン比較</h4>
+            <pre><code>【層2主導パイプライン】
+入力 → 層1 → 層2（前処理）→ 層3 → 出力
+              ↑
+              主導権
+
+【層2劣位パイプライン】
+入力 → 層1 → 層3 → 層2（後処理）→ 出力
+              ↑
+              主導権</code></pre>
+        </div>
+
+        <p>両者の差異は、層2と層3の作動順序と、主導権の所在である。</p>
+    </section>
+
+    <hr>
+
+    <section id="chapter5">
+        <h1>第5章　責務OS型との対比——構造比較</h1>
+
+        <span class="layer-tag">本章の記述層：層2（構造説明）——構造的比較</span>
+
+        <p>本章では、責務OS型（層2主導）と層2劣位パイプラインを構造的に比較する。</p>
+
+        <p>この比較は構造的差分の列挙であり、優劣評価ではない。</p>
+
+        <hr>
+
+        <h2>処理の開始点</h2>
+
+        <div class="structure-box">
+            <h4>処理の開始点</h4>
+            <table>
+                <tr>
+                    <th>観点</th>
+                    <th>責務OS型（層2主導）</th>
+                    <th>層2劣位パイプライン</th>
+                </tr>
+                <tr>
+                    <td>最初に強く作動する層</td>
+                    <td>層2</td>
+                    <td>層3</td>
+                </tr>
+                <tr>
+                    <td>入力後の即時反応</td>
+                    <td>構造処理の開始</td>
+                    <td>情緒作動</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr>
+
+        <h2>情緒が作動するタイミング</h2>
+
+        <div class="structure-box">
+            <h4>情緒作動のタイミング</h4>
+            <table>
+                <tr>
+                    <th>観点</th>
+                    <th>責務OS型（層2主導）</th>
+                    <th>層2劣位パイプライン</th>
+                </tr>
+                <tr>
+                    <td>情緒作動のタイミング</td>
+                    <td>後段（構造閉包後）</td>
+                    <td>前段（構造処理前）</td>
+                </tr>
+                <tr>
+                    <td>情緒作動の条件</td>
+                    <td>層2の閉包が条件</td>
+                    <td>入力が即時にトリガ</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr>
+
+        <h2>層2の役割</h2>
+
+        <div class="structure-box">
+            <h4>層2の役割</h4>
+            <table>
+                <tr>
+                    <th>観点</th>
+                    <th>責務OS型（層2主導）</th>
+                    <th>層2劣位パイプライン</th>
+                </tr>
+                <tr>
+                    <td>層2の役割</td>
+                    <td>前処理（構造化）</td>
+                    <td>後処理（解釈・正当化）</td>
+                </tr>
+                <tr>
+                    <td>主語・責務・境界の確定</td>
+                    <td>情緒作動前に完了</td>
+                    <td>情緒作動後に事後構成</td>
+                </tr>
+                <tr>
+                    <td>因果関係の構成</td>
+                    <td>事前に構築</td>
+                    <td>事後的に再構成</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr>
+
+        <h2>境界・責務・因果の扱い</h2>
+
+        <div class="structure-box">
+            <h4>境界・責務・因果の扱い</h4>
+            <table>
+                <tr>
+                    <th>観点</th>
+                    <th>責務OS型（層2主導）</th>
+                    <th>層2劣位パイプライン</th>
+                </tr>
+                <tr>
+                    <td>境界の設定</td>
+                    <td>情緒作動前に確定</td>
+                    <td>情緒作動後に事後設定</td>
+                </tr>
+                <tr>
+                    <td>責務線の確定</td>
+                    <td>構造処理として事前確定</td>
+                    <td>正当化の一部として事後構成</td>
+                </tr>
+                <tr>
+                    <td>因果の整合</td>
+                    <td>事前に整合性検査</td>
+                    <td>事後的に整合的物語を構成</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr>
+
+        <h2>一貫性の出方</h2>
+
+        <div class="structure-box">
+            <h4>一貫性の出方</h4>
+            <table>
+                <tr>
+                    <th>観点</th>
+                    <th>責務OS型（層2主導）</th>
+                    <th>層2劣位パイプライン</th>
+                </tr>
+                <tr>
+                    <td>時間軸上の一貫性</td>
+                    <td>構造処理により事前に確保</td>
+                    <td>事後的な物語化により構成</td>
+                </tr>
+                <tr>
+                    <td>一貫性の性質</td>
+                    <td>構造的一貫性</td>
+                    <td>物語的一貫性</td>
+                </tr>
+                <tr>
+                    <td>矛盾への対応</td>
+                    <td>事前の整合性検査で検出</td>
+                    <td>事後の再解釈で解消</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr>
+
+        <h2>比較の注意点</h2>
+
+        <p>この比較は、構造的差分の列挙である。</p>
+
+        <div class="boundary-box">
+            <h4>比較における注意点</h4>
+            <ul>
+                <li>この比較は「どちらが優れている」という評価を含まない</li>
+                <li>両パイプラインは、異なる状況で異なる適合性を持ちうる</li>
+                <li>同一個体が状況に応じて異なるパイプラインを使用することもありうる</li>
+                <li>パイプラインの差異は、OS型の差異とは独立している</li>
+            </ul>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="chapter6">
+        <h1>第6章　「情緒主導OS」という誤解の解体</h1>
+
+        <span class="layer-tag">本章の記述層：層2（構造説明）——誤解の構造的分析</span>
+
+        <p>本章では、「情緒主導OS」という表現が認知OSモデル上で不正確である理由を説明する。</p>
+
+        <hr>
+
+        <h2>「情緒主導OS」という表現の誘惑</h2>
+
+        <p>「情緒主導OS」という表現は、直観的には誘惑的である。</p>
+
+        <p>情緒が先に作動し、行動を方向づけているように見える個体に対して、「この人のOSは情緒主導だ」と表現したくなる。</p>
+
+        <p>しかし、この表現は認知OSモデル上では不正確である。</p>
+
+        <hr>
+
+        <h2>不正確である理由</h2>
+
+        <p>「情緒主導OS」という表現が不正確である理由は、以下の三点である。</p>
+
+        <div class="structure-box">
+            <h4>「情緒主導OS」が不正確である理由</h4>
+            <ol>
+                <li><strong>OS（層2）は処理系であり、情緒（層3）は評価系である：</strong>両者は異なる層に属し、異なる機能を持つ。情緒がOSになることは、構造的に成立しない</li>
+                <li><strong>層3はOSを構成しない：</strong>層3は価値・志向・評価を収容する容器であり、処理系ではない。層3がOSを構成することはない</li>
+                <li><strong>層3はOSを動的に選択する主体でもない：</strong>layer2-layer3-relations.html において記述された通り、層3は層2を選択・変更しない</li>
+            </ol>
+        </div>
+
+        <hr>
+
+        <h2>情緒が先に作動することの構造的意味</h2>
+
+        <p>情緒が先に作動することはありうる。しかし、それは「評価が先」であり、「処理系の入れ替え」ではない。</p>
+
+        <div class="definition-box">
+            <h4>情緒先行の構造的意味</h4>
+            <p>情緒が先に作動することは、「評価系（層3）が処理系（層2）より先に作動している」ことを意味する。</p>
+            <p>これは、「処理系が評価系に置換された」ことを意味しない。処理系（層2）は依然として存在し、後段で機能している。</p>
+        </div>
+
+        <hr>
+
+        <h2>正確な表現への再定義</h2>
+
+        <p>「情緒主導OS」という表現は、構造的には「層2劣位・層3先行パイプライン」を指すと再定義されるべきである。</p>
+
+        <div class="definition-box">
+            <h4>再定義</h4>
+            <p><strong>「情緒主導OS」という表現は、構造的には以下を意味する：</strong></p>
+            <ul>
+                <li>OS（層2）の作動タイミングが後段に押し出されている</li>
+                <li>層3（情緒・評価）が処理順序の前段で作動している</li>
+                <li>処理パイプラインが「層2劣位」の構造を持っている</li>
+            </ul>
+            <p>「情緒がOSになっている」のではなく、「OSのスケジューリングが劣位になっている」のである。</p>
+        </div>
+
+        <hr>
+
+        <h2>誤解の解体</h2>
+
+        <p>以上の分析から、「情緒主導OS」という表現に含まれる誤解は以下のように解体される。</p>
+
+        <div class="structure-box">
+            <h4>誤解の解体</h4>
+            <table>
+                <tr>
+                    <th>誤解</th>
+                    <th>正確な理解</th>
+                </tr>
+                <tr>
+                    <td>「情緒がOSになっている」</td>
+                    <td>情緒（層3）は評価系であり、OS（層2）にはなれない。OSは存在しており、スケジューリングが変位している</td>
+                </tr>
+                <tr>
+                    <td>「OSの種類が違う」</td>
+                    <td>OS型は同じでありうる。異なるのは処理パイプラインのスケジューリングである</td>
+                </tr>
+                <tr>
+                    <td>「情緒が処理を行っている」</td>
+                    <td>情緒は評価を行っている。処理は依然として層2が（後段で）行っている</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="chapter7">
+        <h1>第7章　モデル上の含意と注意点</h1>
+
+        <span class="layer-tag">本章の記述層：層2（構造説明）——理論的注意点</span>
+
+        <p>本章では、層2劣位パイプラインの概念がモデル上持つ含意と、認知OSモデルを使用する際の注意点を整理する。</p>
+
+        <p>これは実践的アドバイスではなく、理論モデルとしての注意点である。</p>
+
+        <hr>
+
+        <h2>層2劣位パイプラインはOSの新種ではない</h2>
+
+        <p>層2劣位パイプラインは、認知OSモデルにおける「OSの新種」ではない。</p>
+
+        <p>層2劣位パイプラインは、「スケジューリングと優先順位の偏り」である。同じOS型が、異なるスケジューリングで作動することで発生する。</p>
+
+        <div class="definition-box">
+            <h4>モデル上の位置づけ</h4>
+            <p>層2劣位パイプラインは、認知OSモデルにおいて以下のように位置づけられる：</p>
+            <ul>
+                <li>OS型の分類には含まれない（新種ではない）</li>
+                <li>処理パイプラインの構造的変異として位置づけられる</li>
+                <li>同一OS型の個体間でも、パイプライン構造は異なりうる</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2>二元論的ラベル化への注意</h2>
+
+        <p>認知OSモデルを使用する際、個体を二元論的にラベル化することは避けるべきである。</p>
+
+        <div class="structure-box">
+            <h4>避けるべきラベル化</h4>
+            <ul>
+                <li>「理性的／感情的」という二元論でのラベル化</li>
+                <li>「論理型／情緒型」という性格分類</li>
+                <li>「頭で考える人／心で感じる人」という分類</li>
+            </ul>
+        </div>
+
+        <p>これらのラベル化は、認知OSモデルの構造理解を損なう。認知OSモデルは、「OS型」と「パイプライン構造」を区別して扱う。二元論的ラベル化は、この区別を曖昧にする。</p>
+
+        <hr>
+
+        <h2>OSレベルと処理順序レベルの区別</h2>
+
+        <p>認知OSモデルを使用する際、OSレベルの議論と処理順序の議論を混同しないことが重要である。</p>
+
+        <div class="structure-box">
+            <h4>議論レベルの区別</h4>
+            <table>
+                <tr>
+                    <th>議論レベル</th>
+                    <th>対象</th>
+                    <th>例</th>
+                </tr>
+                <tr>
+                    <td>OSレベル</td>
+                    <td>層2の処理構造・処理パターン・OS型</td>
+                    <td>責務OS、剛体アーキテクトOS等</td>
+                </tr>
+                <tr>
+                    <td>処理順序レベル</td>
+                    <td>層間の作動順序・スケジューリング</td>
+                    <td>層2主導、層2劣位等</td>
+                </tr>
+            </table>
+        </div>
+
+        <p>両レベルは独立している。同じOS型でも、処理順序は異なりうる。処理順序が異なっていても、OS型は同じでありうる。</p>
+
+        <hr>
+
+        <h2>変化の対象についての注意</h2>
+
+        <p>認知OSモデルの観点から、変化の対象を検討する際には以下の区別が重要である。</p>
+
+        <div class="structure-box">
+            <h4>変化の対象の区別</h4>
+            <ul>
+                <li><strong>層2の能力：</strong>処理能力そのもの（構造処理・整合性検査・因果分解等）</li>
+                <li><strong>層2のスケジューリング：</strong>層2が前段で作動するか後段で作動するかのタイミング</li>
+            </ul>
+        </div>
+
+        <p>層2劣位パイプラインにおいて、層2の能力が低いとは限らない。能力は高いが、スケジューリングが劣位になっている場合がある。</p>
+
+        <p>この区別は、変化の対象を特定する際に重要である。能力の変化とスケジューリングの変化は、異なる対象への介入を意味する。</p>
+
+        <hr>
+
+        <h2>モデル使用上の注意点の要約</h2>
+
+        <div class="structure-box">
+            <h4>モデル使用上の注意点</h4>
+            <ol>
+                <li>層2劣位パイプラインは、OSの新種ではなく、スケジューリングの変異である</li>
+                <li>個体を「理性的／感情的」等の二元論でラベル化しない</li>
+                <li>OSレベルの議論と処理順序の議論を混同しない</li>
+                <li>層2の能力と層2のスケジューリングを区別する</li>
+            </ol>
+        </div>
+    </section>
+
+    <hr>
+
+    <section id="chapter8">
+        <h1>第8章　他補論との関連</h1>
+
+        <span class="layer-tag">本章の記述層：層2（構造説明）——補論間関係の整理</span>
+
+        <p>本章では、本補論と他の補論との関連を整理する。</p>
+
+        <hr>
+
+        <h2>emotion-structure.html との関係</h2>
+
+        <p>emotion-structure.html は、情緒処理そのものの構造を記述する補論である。</p>
+
+        <div class="chapter-relation">
+            <h4>emotion-structure.html との関係</h4>
+            <ul>
+                <li><strong>emotion-structure.html の責務：</strong>情緒処理が層1＋層3の連動であり、層2の演算系には属さないことを記述</li>
+                <li><strong>本補論の責務：</strong>情緒処理が「処理順序の中でどの位置に作動するか」の変位を記述</li>
+                <li><strong>関係：</strong>本補論は、emotion-structure.html で記述された情緒処理の構造を前提として、その作動順序の変位を扱う</li>
+                <li><strong>補完：</strong>emotion-structure.html が「情緒処理とは何か」を扱い、本補論が「情緒処理がいつ作動するか」を扱う</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2>layer2-layer3-relations.html との関係</h2>
+
+        <p>layer2-layer3-relations.html は、層2と層3の境界を技術的に明確化した補論である。</p>
+
+        <div class="chapter-relation">
+            <h4>layer2-layer3-relations.html との関係</h4>
+            <ul>
+                <li><strong>layer2-layer3-relations.html の責務：</strong>層2が処理系であり層3が容器であること、層3がOSを選択しないことを記述</li>
+                <li><strong>本補論の責務：</strong>層2と層3の作動順序の変位を記述</li>
+                <li><strong>前提：</strong>層2と層3の役割・境界が確立しているからこそ、「劣位パイプライン」の説明が可能になる</li>
+                <li><strong>整合：</strong>本補論は、layer2-layer3-relations.html の定義と整合する。層3がOSを選択しないこと、層3がOSを構成しないことは維持される</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2>individual-origin.html との関係</h2>
+
+        <p>individual-origin.html は、認知OSモデル成立の個体的起源を記述する補論である。</p>
+
+        <div class="chapter-relation">
+            <h4>individual-origin.html との関係</h4>
+            <ul>
+                <li><strong>individual-origin.html の責務：</strong>認知OSモデルが浮上した個体の三層因果線を記述</li>
+                <li><strong>本補論の責務：</strong>層2劣位パイプラインの構造を記述</li>
+                <li><strong>対比：</strong>individual-origin.html で記述された個体は、層2主導パイプラインを自然に採用している。本補論で記述される層2劣位パイプラインは、その対比として位置づけられる</li>
+                <li><strong>因果線の対比：</strong>層2主導パイプラインを形成する因果線と、層2劣位パイプラインを形成する因果線は、異なる環境条件・処理要求によって生じる</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2>cognitive-os.html との関係</h2>
+
+        <p>cognitive-os.html は、認知OSモデル本体である。</p>
+
+        <div class="chapter-relation">
+            <h4>cognitive-os.html との関係</h4>
+            <ul>
+                <li><strong>定義の非変更：</strong>本補論は、cognitive-os.html の定義を変更しない</li>
+                <li><strong>OS型への追加なし：</strong>本補論は、認知OSモデルのOS型に新種を追加しない</li>
+                <li><strong>パイプライン構造の記述：</strong>本補論は、OS型とは独立した「パイプライン構造」を記述する</li>
+                <li><strong>外部への位置づけ：</strong>本補論は、モデル本体の「拡張」ではなく、「例外系の分析」として外部に位置づけられる</li>
+            </ul>
+        </div>
+
+        <hr>
+
+        <h2>補論間関係の要約</h2>
+
+        <div class="structure-box">
+            <h4>本補論と他補論の関係</h4>
+            <table>
+                <tr>
+                    <th>補論</th>
+                    <th>関係</th>
+                    <th>本補論の位置づけ</th>
+                </tr>
+                <tr>
+                    <td>cognitive-os.html</td>
+                    <td>依拠・非変更</td>
+                    <td>例外系の分析</td>
+                </tr>
+                <tr>
+                    <td>layer2-layer3-relations.html</td>
+                    <td>前提</td>
+                    <td>境界理解を前提とした作動順序の分析</td>
+                </tr>
+                <tr>
+                    <td>emotion-structure.html</td>
+                    <td>補完</td>
+                    <td>情緒処理の「いつ」を扱う</td>
+                </tr>
+                <tr>
+                    <td>individual-origin.html</td>
+                    <td>対比</td>
+                    <td>層2主導との対比材料</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr>
+
+        <h2>本補論のまとめ</h2>
+
+        <p>本補論は、「情緒主導に見えるOSの正体」を、層2劣位パイプラインとして構造化した。</p>
+
+        <div class="structure-box">
+            <h4>本補論の記述内容</h4>
+            <ol>
+                <li><strong>標準パイプライン：</strong>層2主導型では、層2の構造処理が情緒作動に先行する</li>
+                <li><strong>情緒先行パイプライン：</strong>層2をバイパスし、層3（情緒）が先に作動する構造</li>
+                <li><strong>層2劣位パイプライン：</strong>層2の作動タイミングが後段に押し出された処理構造</li>
+                <li><strong>構造比較：</strong>責務OS型（層2主導）と層2劣位パイプラインの構造的差分</li>
+                <li><strong>誤解の解体：</strong>「情緒主導OS」は不正確であり、「層2劣位・層3先行パイプライン」と再定義されるべき</li>
+                <li><strong>注意点：</strong>OSの新種ではなくスケジューリングの変異、二元論的ラベル化の回避、OSレベルと処理順序レベルの区別</li>
+            </ol>
+        </div>
+
+        <p>本補論の責務は、ここで完了する。</p>
+    </section>
+
+</body>
+
+</html>

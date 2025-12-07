@@ -17,21 +17,44 @@
     * 価値観・物語・「なぜ」を収容する不可観測の容器。
     * **注記：** 本モデルにおいて層3は非機能的であり、OS（層2）を直接制御・選択しない。
 
-## 格納ファイル一覧
+---
 
-### 1. Core (基本定義)
-* `cognitive-os.html`: **モデル本体**。三層構造とOS類型の定義。
-* `historical-os-evolution.html`: **歴史的変遷**。肉体系OS→知識処理OS→責務OSへの移行予測。
-* `ai-positioning.html`: **対AI定義**。AIを「層3を持たない縮退系」と定義し、恋愛不可能性を構造的に証明する。
+## 格納ファイル一覧と解説
 
-### 2. Extensions (拡張・応用)
-* `ender-type-responsibility-os.html`: **理想型**。高負荷環境下で構造を維持する「エンダー型」の定義。
-* `layer2-inferior-pipeline.html`: **例外処理**。「情緒主導」に見える現象を、OSの性能差ではなくパイプラインの変異として解析。
-* `multiple-personality-model.html`: **多重人格**。単一OSコアと複数パラメータプロファイルによる構造的説明。
+### 1. Core Definitions (基本定義)
+モデルの核となる構造定義群。
 
-### 3. Context (背景・仕様)
-* `model-positioning.html`: **位置づけ**。既存アカデミア（認知科学・心理学）との境界定義。
-* `individual-origin.html`: **成立起源**。本モデルがいかにして浮上したかの因果記述。
+| ファイル名 | 概要 |
+| :--- | :--- |
+| **`cognitive-os.html`** | **【モデル本体】** 三層構造の定義、および「責務OS」「剛体アーキテクトOS」などのOS類型定義。 |
+| **`historical-os-evolution.html`** | **【歴史的変遷】** 希少性の中心が「肉体系OS」→「知識処理OS」→「責務OS」へと移行する構造的必然性の記述。 |
+| **`ai-positioning.html`** | **【対AI定義】** AIを「層3を持たない縮退系」と定義し、人間との恋愛構造が成立しない理由を構造的に証明する。 |
+
+### 2. Technical Extensions (技術的拡張・補論)
+モデルの境界条件や例外処理に関する詳細仕様。
+
+| ファイル名 | 概要 |
+| :--- | :--- |
+| **`layer2-layer3-relations.html`** | **【層間関係】** 層2（処理系）と層3（容器）の境界定義。「層3はOSを選択しない」という非機能性の技術的解説。 |
+| **`emotion-structure.html`** | **【情緒構造】** 情緒処理を「層2の演算」ではなく「層1（反応）＋層3（評価）のバイパス現象」として位置づける。 |
+| **`layer2-inferior-pipeline.html`** | **【パイプライン変異】** いわゆる「感情的な人」を、OSの性能差ではなく「層2劣位・層3先行」の処理順序として解析する。 |
+| **`ender-type-responsibility-os.html`** | **【理想型モデル】** 高負荷環境下でも因果と境界を維持する「エンダー型責務OS」の構造定義と観測条件。 |
+| **`multiple-personality-model.html`** | **【多重人格構造】** 多重人格現象を「単一OSコア × 複数パラメータプロファイル」の切り替えとして記述する抽象モデル。 |
+
+### 3. Meta Context (メタ・コンテキスト)
+モデル自体の成立背景、限界、およびアカデミアとの位置づけ。
+
+| ファイル名 | 概要 |
+| :--- | :--- |
+| **`model-positioning.html`** | **【位置づけ】** 既存の認知科学・心理学・哲学との関係性と、本モデルの独自性（OS構造理論としての立ち位置）の明示。 |
+| **`establishment-conditions.html`** | **【社会的成立条件】** なぜ「今」このモデルが提示可能になったのか。LLM登場による層2の観測可能化などの外部条件記述。 |
+| **`individual-origin.html`** | **【個体的起源】** 本モデルがいかなる環境・処理要求の因果線によって浮上したかの構造的記述。 |
+| **`model-limits-expansion.html`** | **【限界と拡張】** 本モデルの適用範囲（医学的診断等は不可）と、将来的な拡張可能性（組織OS等）の整理。 |
+
+---
 
 ## 免責事項
 本モデルは、認知構造を理解するための抽象フレームワークであり、医学的診断、心理療法、または個人的なアドバイスを目的とするものではない。
+
+## License
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

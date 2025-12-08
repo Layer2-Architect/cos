@@ -1,5 +1,17 @@
 # Cognitive OS Model (cos)
 
+## 本リポジトリの性質
+
+本リポジトリは、人間の認知構造およびAIとの構造的差異を記述するための**概念フレームワーク仕様**を格納する。
+
+本モデルの定義：
+- 学術論文ではなく、**構造記述のための仕様書**である
+- 実証研究ではなく、**視座を提供するフレームワーク**である
+- 人・AI・社会の構造を見るための**新しい視点**を提供する
+
+本モデルを「採用する」ことで、観測される現象を一貫した構造で記述できる。
+ただし、臨床診断・法的判断・個人評価への使用は意図していない。
+
 ## 概要
 本リポジトリは、人間の認知・行動プロセスを計算機的な「OS（オペレーティングシステム）」のメタファーを用いて構造化した**「認知OSモデル」**の定義ファイル群を管理するものである。
 
@@ -58,3 +70,9 @@
 
 ## License
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+
+## 引用 / Citation
+
+本モデルを引用、参照、あるいは本モデルに基づいた議論を行う場合は、以下の形式を推奨します。
+
+Layer2-Architect. (v1.0.0). Cognitive OS Model. https://github.com/Layer2-Architect/cos

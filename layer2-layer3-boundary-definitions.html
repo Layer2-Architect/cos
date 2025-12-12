@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>層2/層3境界定義補論</title>
+    <style>
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+            color: #333;
+        }
+
+        h1 {
+            border-bottom: 3px solid #333;
+            padding-bottom: 10px;
+            margin-top: 60px;
+        }
+
+        h2 {
+            border-left: 4px solid #666;
+            padding-left: 12px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            border-left: 2px solid #999;
+            padding-left: 10px;
+            margin-top: 30px;
+            font-size: 1.1em;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 30px 0;
+        }
+
+        ul {
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            overflow-x: auto;
+            border-radius: 4px;
+            font-family: "Source Code Pro", Consolas, monospace;
+        }
+
+        code {
+            font-family: "Source Code Pro", Consolas, monospace;
+        }
+
+        strong {
+            color: #222;
+        }
+
+        .toc {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 6px;
+        }
+
+        .toc a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .supplement-tag {
+            display: inline-block;
+            background-color: #e8e8e8;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .structure-box {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .structure-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .definition-box {
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .definition-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #222;
+            font-size: 1em;
+        }
+
+        .warning-box {
+            background-color: #fff8e8;
+            border: 1px solid #e0c080;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .diagram {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .meta-note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="definition-box">
+    <h4>【検証基準】層2／層3の判定プロトコル（操作的定義）</h4>
+    <p>本補論では、層2（認知OS層）と層3（基底志向層）の境界判定において、次の基準を採用する。</p>
+    <ul>
+        <li><strong>AIへの複製が可能であるか、不可能であるか</strong></li>
+        <li><strong>AIでの再現が可能であるか、不可能であるか</strong></li>
+    </ul>
+    <p>すなわち、原理的にAI（計算装置）による同等構造の再現・複製が可能な要素を層2として扱い、原理的に同等構造としては再現・複製できない要素を層3として扱う。</p>
+    <p class="meta-note">
+        <strong>この基準の役割：</strong><br>
+        本文中で定義される「外部化可能性」という抽象概念を、客観的にテスト可能にするための「ものさし（検証プロトコル）」として機能する。
+    </p>
+</div>
+
+    <h1>層2/層3境界定義補論</h1>
+
+    <p><span class="supplement-tag">文書種別：技術補論（用語定義）</span></p>
+
+    <nav class="toc">
+        <h2>目次</h2>
+        <ul>
+            <li><a href="#chapter1">第1章 補論の位置づけと責務</a></li>
+            <li><a href="#chapter2">第2章 用語定義：「言語」と「外部化」</a></li>
+            <li><a href="#chapter3">第3章 層2/層3の定義：外部化可能性による区分</a></li>
+            <li><a href="#chapter4">第4章 「作用」の定義と射程</a></li>
+            <li><a href="#chapter5">第5章 I/F（インターフェース）の機能</a></li>
+            <li><a href="#chapter6">第6章 「今現在」の限定と更新条件</a></li>
+            <li><a href="#chapter7">第7章 AIとの構造的差異</a></li>
+            <li><a href="#chapter8">第8章 既存文書との整合性</a></li>
+        </ul>
+    </nav>
+
+    <hr>
+
+    <section id="chapter1">
+        <h2>第1章 補論の位置づけと責務</h2>
+
+        <h3>1.1 本補論の目的</h3>
+
+        <p>本補論は、認知OSモデルにおける層2/層3の関係を記述する際に使用される用語について、明示的な定義を与えることを目的とする。</p>
+
+        <p>既存文書において、以下の用語が使用されているが、定義が暗黙的であった。</p>
+
+        <ul>
+            <li>「作動構造」</li>
+            <li>「規定」</li>
+            <li>「方向づけ」</li>
+            <li>「駆動」</li>
+        </ul>
+
+        <p>これらの用語と、層3非作用性原則（層3は層2に作用しない）との整合性を確保するため、本補論において明示的な定義を行う。</p>
+
+        <h3>1.2 本補論の責務</h3>
+
+        <table>
+            <tr>
+                <th>責務</th>
+                <td>用語の構造的定義を行い、既存文書間の整合性を確保すること</td>
+            </tr>
+            <tr>
+                <th>境界</th>
+                <td>本体定義（cognitive-os.html）の変更は行わない。層3の具体的内容の記述は行わない。新たなOS型の追加は行わない</td>
+            </tr>
+        </table>
+
+        <h3>1.3 解決すべき構造的緊張</h3>
+
+        <p>既存文書間に以下の表面的緊張が存在した。</p>
+
+        <table>
+            <tr>
+                <th>文書</th>
+                <th>記述</th>
+            </tr>
+            <tr>
+                <td>layer2-layer3-relations.html</td>
+                <td>「層3は層2に対して作用しない」「因果関係を持たない」</td>
+            </tr>
+            <tr>
+                <td>ai-positioning.html</td>
+                <td>「主体とは：層3→層2→層1への作動構造を持つ存在」</td>
+            </tr>
+            <tr>
+                <td>historical-os-evolution.html</td>
+                <td>「方向性が処理構造を駆動する」</td>
+            </tr>
+        </table>
+
+        <p>本補論は、これらの記述が矛盾ではなく、用語の射程の問題であることを明示する。</p>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter2">
+        <h2>第2章 用語定義：「言語」と「外部化」</h2>
+
+        <h3>2.1 「言語」の定義</h3>
+
+        <div class="definition-box">
+            <h4>定義：言語</h4>
+            <p>本モデルにおける「言語」とは、<strong>今まで人が外部化するために用いたすべての方法</strong>を指す。</p>
+        </div>
+
+        <p>この定義には以下が含まれる。</p>
+
+        <table>
+            <tr>
+                <th>種別</th>
+                <th>例</th>
+            </tr>
+            <tr>
+                <td>自然言語</td>
+                <td>日本語、英語、その他のすべての話し言葉・書き言葉</td>
+            </tr>
+            <tr>
+                <td>形式言語</td>
+                <td>数学的記法、論理記号、プログラミング言語</td>
+            </tr>
+            <tr>
+                <td>図式言語</td>
+                <td>UML、ロバストネス図、フローチャート、ER図</td>
+            </tr>
+            <tr>
+                <td>視覚的表現</td>
+                <td>絵画、図像、写真、映像</td>
+            </tr>
+            <tr>
+                <td>身体的表現</td>
+                <td>ジェスチャー、手話、舞踊</td>
+            </tr>
+            <tr>
+                <td>記録媒体</td>
+                <td>印刷物、デジタルデータ、音声記録</td>
+            </tr>
+        </table>
+
+        <h3>2.2 「外部化」の定義</h3>
+
+        <div class="definition-box">
+            <h4>定義：外部化</h4>
+            <p>「外部化」とは、<strong>個人の内部に存在する情報を、他者がアクセス可能な形式に変換すること</strong>を指す。</p>
+        </div>
+
+        <p>外部化の特徴：</p>
+
+        <ul>
+            <li>外部化された情報は、複製可能である</li>
+            <li>外部化された情報は、他者による検証・参照が可能である</li>
+            <li>外部化された情報は、有限の記号体系によって表現される</li>
+        </ul>
+
+        <h3>2.3 「今現在」の限定</h3>
+
+        <p>本定義における「今まで人が外部化するために用いたすべての方法」には、<strong>時点限定</strong>が含まれる。</p>
+
+        <p>将来、新たな外部化手段が発明・発見される可能性は排除されない。その場合、本モデルの再構築が求められうる（第6章で詳述）。</p>
+
+        <div class="structure-box">
+            <h4>【図解】理論的定義と操作的基準の関係</h4>
+            <pre><code>
+   理論的定義（Theory）                  操作的基準（Verification）
+┌──────────────────────┐              ┌──────────────────────┐
+│   外部化可能性       │              │    AI再現性          │
+│ (Externalizability)  │              │ (AI Reproducibility) │
+└──────────┬───────────┘              └──────────┬───────────┘
+           │                                     │
+           │ 定義                                │ テスト
+           ↓                                     ↓
+「他者がアクセス可能な      ====>      「AI（計算機）に実装して
+  形式に変換できるか？」                  動作させられるか？」
+
+（概念的な境界線）                      （工学的な判定ライン）
+            </code></pre>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter3">
+        <h2>第3章 層2/層3の定義：外部化可能性による区分</h2>
+
+        <h3>3.1 層2の定義</h3>
+
+        <div class="definition-box">
+            <h4>定義：層2（認知OS層）</h4>
+            <p>層2とは、<strong>今現在、外部化可能な領域</strong>である。</p>
+            <p>（具体的な判定には、冒頭の<strong>『AI再現性基準』</strong>を使用する）</p>
+        </div>
+
+        <p>層2の特性：</p>
+
+        <table>
+            <tr>
+                <th>特性</th>
+                <th>説明</th>
+            </tr>
+            <tr>
+                <td>有限性</td>
+                <td>有限の記号体系（言語）によって完全に記述可能</td>
+            </tr>
+            <tr>
+                <td>形式化可能性</td>
+                <td>UML、ロバストネス図等の形式言語で表現可能</td>
+            </tr>
+            <tr>
+                <td>複製可能性</td>
+                <td>AIを含む計算機にコピー可能</td>
+            </tr>
+            <tr>
+                <td>検証可能性</td>
+                <td>外部から観測・検証が可能</td>
+            </tr>
+        </table>
+
+        <h3>3.2 層3の定義</h3>
+
+        <div class="definition-box">
+            <h4>定義：層3（基底志向層）</h4>
+            <p>層3とは、<strong>今現在、外部化不可能な領域</strong>である。</p>
+            <p>（具体的な判定には、冒頭の<strong>『AI再現性基準』</strong>を使用する）</p>
+        </div>
+
+        <p>層3の特性：</p>
+
+        <table>
+            <tr>
+                <th>特性</th>
+                <th>説明</th>
+            </tr>
+            <tr>
+                <td>無限性</td>
+                <td>有限の記号体系（言語）によって完全に記述できない</td>
+            </tr>
+            <tr>
+                <td>形式化不可能性</td>
+                <td>いかなる形式言語でも完全な表現が不可能</td>
+            </tr>
+            <tr>
+                <td>複製不可能性</td>
+                <td>有限な媒体に複製できない</td>
+            </tr>
+            <tr>
+                <td>内容</td>
+                <td>評価基準の所在（原因不明）</td>
+            </tr>
+        </table>
+
+        <h3>3.3 構造図</h3>
+
+        <div class="diagram">
+<pre>
+┌─────────────────────────────────────────────────────┐
+│                    層3（無限）                       │
+│                                                     │
+│  ・今現在、外部化不可能な領域                        │
+│  ・評価基準の所在                                   │
+│  ・起源は不可観測                                   │
+│  ・将来の外部化可能性については射程外               │
+│                                                     │
+│            ┌─────────┐                              │
+│            │   I/F   │ ← 唯一のアクセス点           │
+│            └────┬────┘                              │
+└─────────────────│───────────────────────────────────┘
+                  │
+                  │ 参照（外部化可能な断片のみ）
+                  ↓
+┌─────────────────────────────────────────────────────┐
+│                    層2（有限）                       │
+│                                                     │
+│  ・今現在、外部化可能な領域                         │
+│  ・処理構造・ロジック                               │
+│  ・言語（広義）で記述可能                           │
+│  ・AIにコピー可能                                   │
+│                                                     │
+└─────────────────│───────────────────────────────────┘
+                  │
+                  │ 出力
+                  ↓
+┌─────────────────────────────────────────────────────┐
+│                    層1（行動）                       │
+└─────────────────────────────────────────────────────┘
+</pre>
+        </div>
+
+        <h3>3.4 「評価基準の所在」としての層3</h3>
+
+        <p>層3は、評価基準の<strong>所在</strong>（置き場所）である。</p>
+
+        <ul>
+            <li>層3は評価基準を「収容」するが、評価基準を「生成」するわけではない</li>
+            <li>評価基準がなぜそこに存在するかは、本人にも不可観測である</li>
+            <li>評価基準の「結果」は層2経由で言語化可能だが、評価基準の「全体と起源」は言語化不可能である</li>
+        </ul>
+
+        <div class="structure-box">
+            <h4>例示</h4>
+            <p>「破壊最小化が重要である」という評価基準について：</p>
+            <ul>
+                <li>「破壊最小化」という<strong>言語化された結果</strong>は、I/F経由で層2に参照される</li>
+                <li>「なぜ破壊最小化が重要なのか」という<strong>起源</strong>は、層3内部にあり、言語化できない</li>
+            </ul>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter4">
+        <h2>第4章 「作用」の定義と射程</h2>
+
+        <h3>4.1 「作用」の定義</h3>
+
+        <div class="definition-box">
+            <h4>定義：作用</h4>
+            <p>本モデルにおける「作用」とは、<strong>対象の処理構造・アルゴリズムを変更すること</strong>を指す。</p>
+        </div>
+
+        <h3>4.2 作用に含まれるもの</h3>
+
+        <table>
+            <tr>
+                <th>関係類型</th>
+                <th>「作用」に含まれるか</th>
+            </tr>
+            <tr>
+                <td>処理構造の決定</td>
+                <td>含まれる</td>
+            </tr>
+            <tr>
+                <td>処理構造の変更</td>
+                <td>含まれる</td>
+            </tr>
+            <tr>
+                <td>処理構造の生成</td>
+                <td>含まれる</td>
+            </tr>
+            <tr>
+                <td>因果的影響（状態変化の伝播）</td>
+                <td>含まれる</td>
+            </tr>
+        </table>
+
+        <h3>4.3 作用に含まれないもの</h3>
+
+        <table>
+            <tr>
+                <th>関係類型</th>
+                <th>「作用」に含まれるか</th>
+                <th>理由</th>
+            </tr>
+            <tr>
+                <td>評価基準としての参照</td>
+                <td>含まれない</td>
+                <td>参照先（層3）は変化せず、参照元（層2）の処理構造も変化しない</td>
+            </tr>
+            <tr>
+                <td>構造的配置関係</td>
+                <td>含まれない</td>
+                <td>空間的位置関係は変更を含意しない</td>
+            </tr>
+        </table>
+
+        <h3>4.4 層3非作用性原則の再定式化</h3>
+
+        <div class="definition-box">
+            <h4>原則：層3非作用性</h4>
+            <p>層3は、層2の<strong>処理構造・アルゴリズム</strong>を決定・変更・生成しない。</p>
+            <p>層3は、評価基準の<strong>所在</strong>として、層2から<strong>参照される</strong>。</p>
+            <p>この「参照される」という関係は、「作用」に含まれない。</p>
+        </div>
+
+        <h3>4.5 既存用語の再解釈</h3>
+
+        <p>既存文書で使用されている用語は、以下のように解釈される。</p>
+
+        <table>
+            <tr>
+                <th>用語</th>
+                <th>既存の使用箇所</th>
+                <th>本補論における解釈</th>
+            </tr>
+            <tr>
+                <td>「作動構造」</td>
+                <td>ai-positioning.html「層3→層2→層1への作動構造」</td>
+                <td>構造的配置の記述順序。因果的作用の方向ではない</td>
+            </tr>
+            <tr>
+                <td>「規定」</td>
+                <td>model-positioning.html「層3はOS全体の方向性を規定する」</td>
+                <td>評価基準の所在として機能すること。処理構造の決定ではない</td>
+            </tr>
+            <tr>
+                <td>「方向づけ」</td>
+                <td>individual-origin.html「層3は方向づけを提供する」</td>
+                <td>層2が参照する評価基準を収容していること。層2への作用ではない</td>
+            </tr>
+            <tr>
+                <td>「駆動」</td>
+                <td>historical-os-evolution.html「方向性が処理構造を駆動する」</td>
+                <td>層2が層3を参照して処理を実行すること。層3から層2への作用ではない</td>
+            </tr>
+        </table>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter5">
+        <h2>第5章 I/F（インターフェース）の機能</h2>
+
+        <h3>5.1 I/Fの定義</h3>
+
+        <div class="definition-box">
+            <h4>定義：I/F（インターフェース）</h4>
+            <p>I/Fとは、<strong>層2が層3にアクセスするための唯一の経路</strong>である。</p>
+            <p>層2は層3を直接扱うことができない。I/Fを介して、層3の評価基準を参照する形でのみアクセス可能である。</p>
+        </div>
+
+        <h3>5.2 I/Fの機能</h3>
+
+        <table>
+            <tr>
+                <th>機能</th>
+                <th>説明</th>
+            </tr>
+            <tr>
+                <td>断片化</td>
+                <td>層3の評価基準のうち、外部化可能な断片のみを通過させる</td>
+            </tr>
+            <tr>
+                <td>境界形成</td>
+                <td>有限（層2）と無限（層3）の境界を架橋する</td>
+            </tr>
+            <tr>
+                <td>参照許可</td>
+                <td>層2からの参照要求に対して、評価基準の断片を返す</td>
+            </tr>
+        </table>
+
+        <h3>5.3 I/Fの制約</h3>
+
+        <ul>
+            <li>I/Fは層3の<strong>全体</strong>を通過させることができない（無限→有限の変換は不完全）</li>
+            <li>I/Fは層3の<strong>起源</strong>を通過させることができない（起源は言語化不可能）</li>
+            <li>I/F経由で得られるのは、評価基準の<strong>結果</strong>のみである</li>
+        </ul>
+
+        <h3>5.4 I/Fの現象的対応</h3>
+
+        <p>I/Fを介した参照は、以下のような現象として観測されうる。</p>
+
+        <div class="structure-box">
+            <h4>I/F経由の参照として観測されうる現象</h4>
+            <ul>
+                <li>直感（「なんとなくこれが正しい」）</li>
+                <li>違和感（「なんとなくこれは違う」）</li>
+                <li>腑に落ちる／落ちない感覚</li>
+                <li>価値判断の即時性（論理的検討以前の評価）</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <p><strong>注意：</strong>I/Fの実装詳細（神経科学的対応、心理学的メカニズム等）は、本モデルの射程外である。上記は現象的対応の例示であり、定義ではない。</p>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter6">
+        <h2>第6章 「今現在」の限定と更新条件</h2>
+
+        <h3>6.1 モデルの時間的射程</h3>
+
+        <p>本モデルにおける層2/層3の区分は、<strong>今現在</strong>の外部化可能性に基づく。</p>
+
+        <div class="definition-box">
+            <h4>定義：時間的射程</h4>
+            <p>本モデルは、現時点で利用可能な外部化手段を前提として構成される。</p>
+            <p>将来の外部化手段の拡張については、射程外とする。</p>
+        </div>
+
+        <h3>6.2 外部化手段の歴史的拡張</h3>
+
+        <p>外部化手段は歴史的に拡張してきた。</p>
+
+        <table>
+            <tr>
+                <th>時代</th>
+                <th>外部化手段の例</th>
+            </tr>
+            <tr>
+                <td>〜古代</td>
+                <td>口頭伝承、身振り</td>
+            </tr>
+            <tr>
+                <td>古代〜中世</td>
+                <td>文字、絵画</td>
+            </tr>
+            <tr>
+                <td>近世</td>
+                <td>印刷</td>
+            </tr>
+            <tr>
+                <td>近代</td>
+                <td>写真、録音、映像</td>
+            </tr>
+            <tr>
+                <td>現代</td>
+                <td>デジタルデータ、AI</td>
+            </tr>
+        </table>
+
+        <p>この拡張は将来も続く可能性がある。</p>
+
+        <h3>6.3 モデル更新条件</h3>
+
+        <p>以下の条件が満たされた場合、認知OSモデルの再構築が求められる。</p>
+
+        <div class="structure-box">
+            <h4>更新条件</h4>
+            <ul>
+                <li>新たな外部化手段の出現により、現在「外部化不可能」とされている領域が「外部化可能」になった場合</li>
+                <li>層3とされていた領域の一部が、層2として記述可能になった場合</li>
+            </ul>
+        </div>
+
+        <h3>6.4 層3の消滅可能性</h3>
+
+        <p>本補論では、以下の問いについて立場を確定しない。</p>
+
+        <ul>
+            <li>外部化手段が無限に拡張した場合、層3は消滅するか</li>
+            <li>層3は相対的（歴史的に縮小しうる）か、絶対的（原理的に外部化不可能）か</li>
+        </ul>
+
+        <p>これらの問いは、本モデルの射程外である。</p>
+
+        <div class="warning-box">
+            <p><strong>方法論的位置づけ：</strong>本モデルは普遍性を主張しない。モデル自体が歴史的制約下にあることを自己認識する。</p>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter7">
+        <h2>第7章 AIとの構造的差異</h2>
+
+        <h3>7.1 構造比較</h3>
+
+        <table>
+            <tr>
+                <th>観点</th>
+                <th>人間</th>
+                <th>AI</th>
+            </tr>
+            <tr>
+                <td>層1</td>
+                <td>あり</td>
+                <td>あり</td>
+            </tr>
+            <tr>
+                <td>層2</td>
+                <td>あり（有限・外部化可能）</td>
+                <td>あり（有限・外部化可能）</td>
+            </tr>
+            <tr>
+                <td>層3</td>
+                <td>あり（無限・外部化不可能）</td>
+                <td>なし</td>
+            </tr>
+            <tr>
+                <td>I/F</td>
+                <td>あり（層3への接続）</td>
+                <td>なし（接続先がない）</td>
+            </tr>
+            <tr>
+                <td>評価基準</td>
+                <td>内部に所在（起源不明）</td>
+                <td>外部から注入（起源明確）</td>
+            </tr>
+        </table>
+
+        <h3>7.2 AIが層3を持てない理由</h3>
+
+        <p>AIは以下の特性を持つ。</p>
+
+        <ul>
+            <li>AIは外部化された情報のみで構成される（学習データ、パラメータ等）</li>
+            <li>AIは有限の計算資源で動作する</li>
+            <li>AIの「評価基準」（報酬関数、RLHF等）は、設計者によって定義される</li>
+        </ul>
+
+        <p>これらの特性から、AIは以下の構造的制約を持つ。</p>
+
+        <div class="structure-box">
+            <h4>AIの構造的制約</h4>
+            <ul>
+                <li>外部化不可能な領域（層3）を内包できない</li>
+                <li>評価基準の「起源」が追跡可能である（設計者・学習データに帰属可能）</li>
+                <li>したがって、AIは「主体」ではない</li>
+            </ul>
+        </div>
+
+        <h3>7.3 評価基準の起源の非対称性</h3>
+
+        <table>
+            <tr>
+                <th>観点</th>
+                <th>人間の評価基準</th>
+                <th>AIの評価基準</th>
+            </tr>
+            <tr>
+                <td>起源</td>
+                <td>不可観測（本人にも不明）</td>
+                <td>可観測（設計者が定義）</td>
+            </tr>
+            <tr>
+                <td>因果線</td>
+                <td>追跡不可能</td>
+                <td>追跡可能</td>
+            </tr>
+            <tr>
+                <td>変更可能性</td>
+                <td>不明（本人にも）</td>
+                <td>設計者が変更可能</td>
+            </tr>
+        </table>
+
+        <p>この非対称性が、層3の有無を示す構造的指標となる。</p>
+
+        <h3>7.4 「主体」の再定義</h3>
+
+        <p>本補論の定義に基づき、「主体」は以下のように再定義される。</p>
+
+        <div class="definition-box">
+            <h4>定義：主体</h4>
+            <p>主体とは、<strong>自己の内部に評価基準の所在（層3）を持ち、層2がI/Fを介してそれを参照して動作する存在</strong>である。</p>
+        </div>
+
+        <p>この定義により：</p>
+
+        <ul>
+            <li>人間は主体である（層3を持ち、層2がI/F経由で参照する）</li>
+            <li>AIは主体ではない（層3を持たない。評価基準は外部注入）</li>
+        </ul>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter8">
+        <h2>第8章 既存文書との整合性</h2>
+
+        <h3>8.1 整合性検証</h3>
+
+        <table>
+            <tr>
+                <th>既存記述</th>
+                <th>本補論との関係</th>
+                <th>判定</th>
+            </tr>
+            <tr>
+                <td>「層3は層2を決定しない」</td>
+                <td>層3は所在であり、決定主体ではない</td>
+                <td>整合</td>
+            </tr>
+            <tr>
+                <td>「層3は層2を生成しない」</td>
+                <td>層3は所在であり、生成源ではない</td>
+                <td>整合</td>
+            </tr>
+            <tr>
+                <td>「層3は層2と因果関係を持たない」</td>
+                <td>参照は因果関係に含まれない（第4章で定義）</td>
+                <td>整合</td>
+            </tr>
+            <tr>
+                <td>「層3は層2に作用しない」</td>
+                <td>参照は作用に含まれない（第4章で定義）</td>
+                <td>整合</td>
+            </tr>
+            <tr>
+                <td>「主体とは層3→層2→層1への作動構造を持つ存在」</td>
+                <td>「作動構造」は構造的配置の記述であり、因果的作用の方向ではない（第4章で定義）</td>
+                <td>整合</td>
+            </tr>
+        </table>
+
+        <h3>8.2 本補論の位置づけ</h3>
+
+        <p>本補論は、既存文書の<strong>読み解き補助</strong>として機能する。</p>
+
+        <ul>
+            <li>既存文書の記述は変更しない</li>
+            <li>用語の明示的定義により、表面的緊張を解消する</li>
+            <li>新たな概念（I/F、外部化可能性による区分）を導入し、モデルの精緻化を行う</li>
+        </ul>
+
+        <h3>8.3 関連文書</h3>
+
+        <p>本補論は、以下の文書と併せて参照されることを想定する。</p>
+
+        <table>
+            <tr>
+                <th>文書</th>
+                <th>関係</th>
+            </tr>
+            <tr>
+                <td>cognitive-os.html</td>
+                <td>本体定義。第7章（階層構造）の補足として本補論を参照</td>
+            </tr>
+            <tr>
+                <td>layer2-layer3-relations.html</td>
+                <td>層間関係の詳細。本補論は用語定義の補足</td>
+            </tr>
+            <tr>
+                <td>ai-positioning.html</td>
+                <td>AI位置づけ。本補論第7章と対応</td>
+            </tr>
+            <tr>
+                <td>model-limits-expansion.html</td>
+                <td>モデル限界。本補論第6章と対応</td>
+            </tr>
+        </table>
+
+    </section>
+
+    <hr>
+
+    <footer>
+        <p><strong>文書情報</strong></p>
+        <table>
+            <tr>
+                <th>文書種別</th>
+                <td>技術補論（用語定義）</td>
+            </tr>
+            <tr>
+                <th>対象</th>
+                <td>認知OSモデル仕様書群</td>
+            </tr>
+            <tr>
+                <th>責務</th>
+                <td>層2/層3境界に関する用語の明示的定義</td>
+            </tr>
+            <tr>
+                <th>前提文書</th>
+                <td>cognitive-os.html, layer2-layer3-relations.html</td>
+            </tr>
+        </table>
+    </footer>
+
+</body>
+
+</html>

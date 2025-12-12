@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>層2/層3動的挙動補論</title>
+    <style>
+        body {
+            font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+            color: #333;
+        }
+
+        h1 {
+            border-bottom: 3px solid #333;
+            padding-bottom: 10px;
+            margin-top: 60px;
+        }
+
+        h2 {
+            border-left: 4px solid #666;
+            padding-left: 12px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            border-left: 2px solid #999;
+            padding-left: 10px;
+            margin-top: 30px;
+            font-size: 1.1em;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 30px 0;
+        }
+
+        ul {
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            overflow-x: auto;
+            border-radius: 4px;
+            font-family: "Source Code Pro", Consolas, monospace;
+        }
+
+        code {
+            font-family: "Source Code Pro", Consolas, monospace;
+        }
+
+        strong {
+            color: #222;
+        }
+
+        .toc {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 6px;
+        }
+
+        .toc a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .supplement-tag {
+            display: inline-block;
+            background-color: #e8e8e8;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .structure-box {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .structure-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .definition-box {
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .definition-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #222;
+            font-size: 1em;
+        }
+
+        .warning-box {
+            background-color: #fff8e8;
+            border: 1px solid #e0c080;
+            border-radius: 4px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .diagram {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .relation-table {
+            background-color: #fafafa;
+        }
+
+        .relation-table th {
+            background-color: #e8e8e8;
+        }
+        
+        .meta-note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="definition-box">
+    <h4>【検証基準】層2／層3の判定プロトコル（操作的定義）</h4>
+    <p>本補論では、層2（認知OS層）と層3（基底志向層）の境界判定において、次の基準を採用する。</p>
+    <ul>
+        <li><strong>AIへの複製が可能であるか、不可能であるか</strong></li>
+        <li><strong>AIでの再現が可能であるか、不可能であるか</strong></li>
+    </ul>
+    <p>すなわち、原理的にAI（計算装置）による同等構造の再現・複製が可能な要素を層2として扱い、原理的に同等構造としては再現・複製できない要素を層3として扱う。</p>
+    <p class="meta-note">
+        <strong>この基準の役割：</strong><br>
+        本文中で定義される「外部化可能性」という抽象概念を、客観的にテスト可能にするための「ものさし（検証プロトコル）」として機能する。
+    </p>
+</div>
+
+<h1>層2/層3動的挙動補論</h1>
+
+    <p><span class="supplement-tag">文書種別：技術補論（動的挙動記述）</span></p>
+
+    <nav class="toc">
+        <h2>目次</h2>
+        <ul>
+            <li><a href="#chapter1">第1章 本補論の位置づけ</a></li>
+            <li><a href="#chapter2">第2章 「参照」と「圧力」の関係</a></li>
+            <li><a href="#chapter3">第3章 層2のパラメータ体系</a></li>
+            <li><a href="#chapter4">第4章 層2のアーキテクチャ類型</a></li>
+            <li><a href="#chapter5">第5章 層2→層3境界の現象</a></li>
+            <li><a href="#chapter6">第6章 層3→層2の圧力体系</a></li>
+            <li><a href="#chapter7">第7章 関連文書との整合性</a></li>
+        </ul>
+    </nav>
+
+    <hr>
+
+    <section id="chapter1">
+        <h2>第1章 本補論の位置づけ</h2>
+
+        <h3>1.1 目的</h3>
+
+        <p>本補論は、認知OSモデルにおける層2/層3間の<strong>動的挙動</strong>を記述することを目的とする。</p>
+
+        <p>先行する「層2/層3境界定義補論」（layer2-layer3-boundary-definitions.html）が<strong>静的定義</strong>（用語の意味、外部化可能性による区分）を扱うのに対し、本補論は<strong>動的挙動</strong>（どのように作動するか）を扱う。</p>
+
+        <h3>1.2 関連文書との三層構造</h3>
+
+        <table>
+            <tr>
+                <th>文書</th>
+                <th>責務</th>
+                <th>記述内容</th>
+            </tr>
+            <tr>
+                <td>layer2-layer3-relations.html</td>
+                <td>否定規定</td>
+                <td>層3は層2に対して何を<strong>しないか</strong></td>
+            </tr>
+            <tr>
+                <td>layer2-layer3-boundary-definitions.html</td>
+                <td>用語定義</td>
+                <td>各用語は何を<strong>意味するか</strong></td>
+            </tr>
+            <tr>
+                <td>layer2-layer3-dynamics.html（本文書）</td>
+                <td>動的挙動</td>
+                <td>層2/層3はどのように<strong>作動するか</strong></td>
+            </tr>
+        </table>
+
+        <h3>1.3 本補論の責務と境界</h3>
+
+        <table>
+            <tr>
+                <th>責務</th>
+                <td>層2/層3間の動的挙動（参照、圧力、パラメータ、アーキテクチャ類型）を記述すること</td>
+            </tr>
+            <tr>
+                <th>境界</th>
+                <td>層3の内容（具体的な評価基準の内容）には踏み込まない。層3は依然としてブラックボックスとして扱う</td>
+            </tr>
+        </table>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter2">
+        <h2>第2章 「参照」と「圧力」の関係</h2>
+
+        <h3>2.1 問題の所在</h3>
+
+        <p>層2/層3の関係を記述する際、二つの概念が使用される。</p>
+
+        <table class="relation-table">
+            <tr>
+                <th>概念</th>
+                <th>定義</th>
+                <th>主語</th>
+                <th>方向</th>
+            </tr>
+            <tr>
+                <td>参照</td>
+                <td>層2が層3のI/Fにアクセスする</td>
+                <td>層2（能動）</td>
+                <td>層2→層3</td>
+            </tr>
+            <tr>
+                <td>圧力</td>
+                <td>層3が層2に影響を与える</td>
+                <td>層3（能動）</td>
+                <td>層3→層2</td>
+            </tr>
+        </table>
+
+        <p>表面的には、これらは矛盾する（層2が能動なのか、層3が能動なのか）。</p>
+
+        <p>本章では、この二概念が矛盾ではなく、異なる記述レベルの現象であることを明示する。</p>
+
+        <h3>2.2 「圧力」と「参照」の記述レベル</h3>
+
+        <div class="definition-box">
+            <h4>定義：圧力（Pressure）</h4>
+            <p>「圧力」とは、<strong>層3の存在が層2に与える構造的影響</strong>を指す。</p>
+            <p>これは存在論的（ontological）な概念であり、層3が存在する限り常に発生している。</p>
+        </div>
+
+        <div class="definition-box">
+            <h4>定義：参照（Reference）</h4>
+            <p>「参照」とは、<strong>層2がI/F経由で層3の評価基準を取得する行為</strong>を指す。</p>
+            <p>これは操作的（operational）な概念であり、層2の処理として断続的に発生する。</p>
+        </div>
+
+        <h3>2.3 両概念の関係</h3>
+
+        <table>
+            <tr>
+                <th>観点</th>
+                <th>圧力</th>
+                <th>参照</th>
+            </tr>
+            <tr>
+                <td>性質</td>
+                <td>存在論的（常にそこにある）</td>
+                <td>操作的（層2のアクション）</td>
+            </tr>
+            <tr>
+                <td>時間性</td>
+                <td>持続的</td>
+                <td>断続的</td>
+            </tr>
+            <tr>
+                <td>発生源</td>
+                <td>層3の存在</td>
+                <td>層2の処理</td>
+            </tr>
+            <tr>
+                <td>記述対象</td>
+                <td>層3が層2に与える構造的影響</td>
+                <td>層2がI/F経由で評価基準を取得する行為</td>
+            </tr>
+        </table>
+
+        <h3>2.4 関係の定式化</h3>
+
+        <div class="definition-box">
+            <h4>定式：圧力は参照の駆動因である</h4>
+            <ul>
+                <li>層3は層2に対して「圧力」を与える（存在論的）</li>
+                <li>層2は圧力への応答として層3を「参照」する（操作的）</li>
+                <li>「圧力」は層3の存在に由来し、「参照」は層2の処理に由来する</li>
+                <li>両者は矛盾ではなく、異なる記述レベルの現象である</li>
+            </ul>
+        </div>
+
+        <h3>2.5 構造図</h3>
+
+        <div class="diagram">
+<pre>
+層3（評価基準の所在）
+    │
+    │ 【圧力】（存在論的・持続的）
+    │  層3の存在が層2に与える構造的影響
+    │  「処理せよ」「評価せよ」という要請
+    │
+    ↓
+    │
+    ↑ 【参照】（操作的・断続的）
+    │  圧力への応答としてI/F経由で評価基準を取得
+    │
+層2（認知OS）
+    │
+    ↓ 出力
+層1（行動）
+</pre>
+        </div>
+
+        <h3>2.6 層3非作用性原則との整合</h3>
+
+        <p>「層3は層2に作用しない」という原則と「圧力」の概念は、以下のように整合する。</p>
+
+        <table>
+            <tr>
+                <th>概念</th>
+                <th>層3非作用性原則との関係</th>
+            </tr>
+            <tr>
+                <td>作用</td>
+                <td>層2の処理構造・アルゴリズムを変更すること（否定される）</td>
+            </tr>
+            <tr>
+                <td>圧力</td>
+                <td>層2の処理構造を変更しない。層2が応答すべき「要請」として存在する（許容される）</td>
+            </tr>
+        </table>
+
+        <p>圧力は層2の処理構造を変更しない。層2がどのように応答するかは、層2のパラメータとアーキテクチャに依存する。</p>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter3">
+        <h2>第3章 層2のパラメータ体系</h2>
+
+        <h3>3.1 パラメータの定義</h3>
+
+        <p>層2（認知OS）は、複数のパラメータによって挙動が調整される。</p>
+
+        <p>これらのパラメータは、層3からの圧力への応答パターンを決定する。</p>
+
+        <h3>3.2 主要パラメータ</h3>
+
+        <table>
+            <tr>
+                <th>パラメータ名</th>
+                <th>定義</th>
+                <th>値域</th>
+            </tr>
+            <tr>
+                <td>閉包欲求<br>（Closure Desire）</td>
+                <td>結論を出そうとする強度。「早く結論を出せ」「白黒つけろ」という内的要請の強さ</td>
+                <td>高 ↔ 低</td>
+            </tr>
+            <tr>
+                <td>判断保留許容度<br>（Suspend Judgment Tolerance）</td>
+                <td>結論を出さずに留保できる許容度。「今は結論を出さなくていい」という状態の許容範囲</td>
+                <td>低 ↔ 高</td>
+            </tr>
+            <tr>
+                <td>境界厳密性<br>（Boundary Strictness）</td>
+                <td>主語・責務・境界を厳密に区分する度合い</td>
+                <td>高 ↔ 低</td>
+            </tr>
+        </table>
+
+        <h3>3.3 パラメータ間の関係</h3>
+
+        <p>これらのパラメータは独立ではなく、相互に関連する。</p>
+
+        <div class="structure-box">
+            <h4>典型的な相関パターン</h4>
+            <table>
+                <tr>
+                    <th>パターン</th>
+                    <th>閉包欲求</th>
+                    <th>判断保留許容度</th>
+                    <th>境界厳密性</th>
+                    <th>特徴</th>
+                </tr>
+                <tr>
+                    <td>厳密処理型</td>
+                    <td>高</td>
+                    <td>低</td>
+                    <td>高</td>
+                    <td>迅速な判断、明確な区分、曖昧さへの耐性が低い</td>
+                </tr>
+                <tr>
+                    <td>保留許容型</td>
+                    <td>低</td>
+                    <td>高</td>
+                    <td>低</td>
+                    <td>判断を急がない、境界を緩やかに扱う、曖昧さへの耐性が高い</td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>3.4 パラメータと層3への応答</h3>
+
+        <p>層3からの圧力に対する層2の応答は、これらのパラメータによって異なる。</p>
+
+        <table>
+            <tr>
+                <th>層3からの入力</th>
+                <th>閉包欲求・高の場合</th>
+                <th>閉包欲求・低の場合</th>
+            </tr>
+            <tr>
+                <td>曖昧な評価基準</td>
+                <td>即座に解釈を確定しようとする</td>
+                <td>曖昧なまま保持し、処理を継続する</td>
+            </tr>
+            <tr>
+                <td>矛盾する評価基準</td>
+                <td>どちらかを選択し、他方を棄却する</td>
+                <td>両方を保持し、状況に応じて使い分ける</td>
+            </tr>
+            <tr>
+                <td>言語化困難な評価基準</td>
+                <td>無理に言語化しようとし、歪みが生じる</td>
+                <td>言語化せずに「感覚」として保持する</td>
+            </tr>
+        </table>
+
+        <h3>3.5 パラメータの可変性</h3>
+
+        <p>これらのパラメータは固定ではなく、以下の条件で変動しうる。</p>
+
+        <ul>
+            <li>状況・文脈による一時的変動</li>
+            <li>学習・訓練による長期的変動</li>
+            <li>層3クラスタの切り替えに伴う変動（多重人格モデル参照）</li>
+        </ul>
+
+        <div class="warning-box">
+            <p><strong>注意：</strong>パラメータの「最適値」は存在しない。どのパラメータ設定が適切かは、状況・目的・層3の内容に依存する。</p>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter4">
+        <h2>第4章 層2のアーキテクチャ類型</h2>
+
+        <h3>4.1 アーキテクチャの定義</h3>
+
+        <p>層2は、パラメータだけでなく、より根本的な<strong>アーキテクチャ（構造設計）</strong>によって分類される。</p>
+
+        <p>アーキテクチャは、層2が情報をどのように扱うかの基本方針を決定する。</p>
+
+        <h3>4.2 二つのアーキテクチャ類型</h3>
+
+        <div class="definition-box">
+            <h4>定義：コンテナ型（Container Type）</h4>
+            <p>入力を<strong>捕捉・固定・理解</strong>しようとするアーキテクチャ。</p>
+            <p>情報を「箱」に入れて保持・加工することを基本方針とする。</p>
+        </div>
+
+        <div class="definition-box">
+            <h4>定義：チャンネル型（Channel Type）</h4>
+            <p>入力を<strong>捕捉せず通過</strong>させるアーキテクチャ。</p>
+            <p>情報を「管」として流すことを基本方針とする。</p>
+        </div>
+
+        <h3>4.3 アーキテクチャ比較</h3>
+
+        <table>
+            <tr>
+                <th>観点</th>
+                <th>コンテナ型</th>
+                <th>チャンネル型</th>
+            </tr>
+            <tr>
+                <td>基本動作</td>
+                <td>捕捉・固定・理解</td>
+                <td>通過（Throughput）</td>
+            </tr>
+            <tr>
+                <td>情報の扱い</td>
+                <td>貯蔵・加工</td>
+                <td>流通・転送</td>
+            </tr>
+            <tr>
+                <td>メタファー</td>
+                <td>箱（Container）</td>
+                <td>管（Pipe）</td>
+            </tr>
+            <tr>
+                <td>層3との関係</td>
+                <td>層3からの無限入力に対して脆弱</td>
+                <td>層3からの無限入力を処理可能</td>
+            </tr>
+            <tr>
+                <td>典型的状態</td>
+                <td>分析、判断、結論導出</td>
+                <td>直観、瞑想、創造的状態</td>
+            </tr>
+        </table>
+
+        <h3>4.4 アーキテクチャと層3からの入力</h3>
+
+        <p>層3は「無限」（外部化不可能）であるため、層3からの入力は本質的に「有限の形式に収まらない」性質を持つ。</p>
+
+        <table>
+            <tr>
+                <th>アーキテクチャ</th>
+                <th>層3からの無限入力への応答</th>
+            </tr>
+            <tr>
+                <td>コンテナ型</td>
+                <td>無限を有限の箱に入れようとする → オーバーフロー、処理不能、認知的不協和</td>
+            </tr>
+            <tr>
+                <td>チャンネル型</td>
+                <td>無限を捕捉せず流す → 処理可能、ただし「理解」はしない</td>
+            </tr>
+        </table>
+
+        <h3>4.5 アーキテクチャの切り替え</h3>
+
+        <p>アーキテクチャは固定ではなく、切り替え可能である。</p>
+
+        <div class="structure-box">
+            <h4>切り替えの条件</h4>
+            <ul>
+                <li><strong>意図的切り替え</strong>：瞑想、創造的作業、特定の訓練</li>
+                <li><strong>状況的切り替え</strong>：極度の集中、フロー状態、危機的状況</li>
+                <li><strong>偶発的切り替え</strong>：層2の処理限界に達した際の自動切り替え</li>
+            </ul>
+        </div>
+
+        <h3>4.6 アーキテクチャの安定化</h3>
+
+        <p>特定のアーキテクチャが繰り返し使用されると、そのアーキテクチャは安定化しうる。</p>
+
+        <p>これは「例外処理」から「安定した別モード」への移行である。</p>
+
+        <div class="structure-box">
+            <h4>安定化の例</h4>
+            <table>
+                <tr>
+                    <th>初期状態</th>
+                    <th>繰り返し</th>
+                    <th>安定化後</th>
+                </tr>
+                <tr>
+                    <td>チャンネル型への一時的切り替え</td>
+                    <td>瞑想的状態の反復</td>
+                    <td>「瞑想モード」として安定的にアクセス可能</td>
+                </tr>
+                <tr>
+                    <td>コンテナ型の一時的緩和</td>
+                    <td>創造的作業の反復</td>
+                    <td>「創造モード」として安定的にアクセス可能</td>
+                </tr>
+            </table>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter5">
+        <h2>第5章 層2→層3境界の現象</h2>
+
+        <h3>5.1 境界の所在</h3>
+
+        <p>層2と層3の間には、構造的な境界が存在する。</p>
+
+        <p>この境界は「I/F（インターフェース）」として定義されているが、境界自体にも現象が発生する。</p>
+
+        <h3>5.2 事象の地平面</h3>
+
+        <div class="definition-box">
+            <h4>定義：事象の地平面（Event Horizon）</h4>
+            <p>「事象の地平面」とは、<strong>層2が処理を諦める限界ライン</strong>を指す。</p>
+            <p>この限界ラインの形状をトレースすることで、層3の「輪郭」を間接的に観測できる。</p>
+        </div>
+
+        <p>層3自体は観測不可能（外部化不可能）だが、層2の処理限界を観測することで、層3の存在と形状を間接的に推定できる。</p>
+
+        <div class="structure-box">
+            <h4>メタファー</h4>
+            <p>ブラックホールそのものは見えないが、その重力によって歪む周囲の空間や、飲み込まれる際の光を観測することで、ブラックホールの存在と形状を推定できる。</p>
+            <p>同様に、層3そのものは観測できないが、層2の「歪み」を観測することで、層3を間接的に記述できる。</p>
+        </div>
+
+        <h3>5.3 写像変質（Compression Artifacts）</h3>
+
+        <div class="definition-box">
+            <h4>定義：写像変質（Compression Artifacts）</h4>
+            <p>「写像変質」とは、<strong>層3→層2変換時に生じるエラー・ノイズの類型</strong>を指す。</p>
+            <p>無限（層3）を有限（層2）に変換する際、情報の損失・歪みが必然的に発生する。</p>
+        </div>
+
+        <h3>5.4 写像変質の類型</h3>
+
+        <table>
+            <tr>
+                <th>類型</th>
+                <th>説明</th>
+                <th>現象例</th>
+            </tr>
+            <tr>
+                <td>言語化エラー</td>
+                <td>言語に落とし込んだ瞬間に意味が変質する</td>
+                <td>「言いたいことはこれじゃない」感覚</td>
+            </tr>
+            <tr>
+                <td>構造崩壊</td>
+                <td>構造として把握しようとすると形が崩れる</td>
+                <td>説明しようとすると分からなくなる</td>
+            </tr>
+            <tr>
+                <td>沈黙化</td>
+                <td>言語化を諦め、沈黙として出力される</td>
+                <td>「言葉にならない」状態</td>
+            </tr>
+            <tr>
+                <td>詩的変換</td>
+                <td>論理ではなく比喩・イメージとして出力される</td>
+                <td>メタファーでしか表現できない状態</td>
+            </tr>
+            <tr>
+                <td>論理破綻</td>
+                <td>論理的整合性が維持できない状態で出力される</td>
+                <td>矛盾を含んだまま表現される</td>
+            </tr>
+        </table>
+
+        <h3>5.5 写像変質の構造的理由</h3>
+
+        <p>写像変質は「失敗」ではなく、構造的必然である。</p>
+
+        <div class="structure-box">
+            <h4>理由</h4>
+            <ul>
+                <li>層3は「外部化不可能」（無限）である</li>
+                <li>層2は「外部化可能」（有限）である</li>
+                <li>無限を有限に変換する際、情報損失は原理的に不可避</li>
+                <li>写像変質は、この「型変換エラー（Type Conversion Error）」の現れである</li>
+            </ul>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter6">
+        <h2>第6章 層3→層2の圧力体系</h2>
+
+        <h3>6.1 圧力の存在論的位置づけ</h3>
+
+        <p>第2章で定義したように、「圧力」は層3の存在が層2に与える構造的影響である。</p>
+
+        <p>本章では、この圧力の種類と方向性を記述する。</p>
+
+        <h3>6.2 圧力ベクトル</h3>
+
+        <div class="definition-box">
+            <h4>定義：圧力ベクトル（Pressure Vector）</h4>
+            <p>「圧力ベクトル」とは、<strong>層3から層2への影響の方向性</strong>を指す。</p>
+        </div>
+
+        <h3>6.3 圧力の類型</h3>
+
+        <table>
+            <tr>
+                <th>圧力類型</th>
+                <th>定義</th>
+                <th>層2への影響</th>
+            </tr>
+            <tr>
+                <td>収束圧力<br>（Convergent Pressure）</td>
+                <td>「もっと厳密にしろ」という方向の圧力</td>
+                <td>境界厳密性の上昇、閉包欲求の増大</td>
+            </tr>
+            <tr>
+                <td>拡散圧力<br>（Divergent Pressure）</td>
+                <td>「もっと自由にしろ」という方向の圧力</td>
+                <td>境界厳密性の低下、判断保留許容度の増大</td>
+            </tr>
+        </table>
+
+        <h3>6.4 圧力と評価基準の関係</h3>
+
+        <p>圧力の方向性は、層3に収容されている評価基準の性質に依存する。</p>
+
+        <div class="structure-box">
+            <h4>例示</h4>
+            <table>
+                <tr>
+                    <th>評価基準の性質</th>
+                    <th>典型的な圧力</th>
+                </tr>
+                <tr>
+                    <td>厳密性・正確性を重視する評価基準</td>
+                    <td>収束圧力</td>
+                </tr>
+                <tr>
+                    <td>創造性・可能性を重視する評価基準</td>
+                    <td>拡散圧力</td>
+                </tr>
+                <tr>
+                    <td>状況依存的な評価基準</td>
+                    <td>状況に応じて圧力が変動</td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>6.5 圧力への応答パターン</h3>
+
+        <p>層2は圧力に対して、パラメータとアーキテクチャに応じた応答を行う。</p>
+
+        <table>
+            <tr>
+                <th>圧力</th>
+                <th>コンテナ型の応答</th>
+                <th>チャンネル型の応答</th>
+            </tr>
+            <tr>
+                <td>収束圧力</td>
+                <td>厳密な処理を実行、境界を明確化</td>
+                <td>収束方向の情報を優先的に通過させる</td>
+            </tr>
+            <tr>
+                <td>拡散圧力</td>
+                <td>処理困難、オーバーフローの可能性</td>
+                <td>拡散方向の情報を通過させる、創造的状態</td>
+            </tr>
+        </table>
+
+        <h3>6.6 圧力の不可観測性</h3>
+
+        <p>圧力自体は直接観測できない。観測可能なのは、層2の応答（挙動の変化）のみである。</p>
+
+        <p>圧力の存在と方向性は、層2の挙動から推定される。</p>
+
+        <div class="warning-box">
+            <p><strong>注意：</strong>圧力は層3の存在に由来するため、圧力の「起源」は層3と同様に不可観測である。なぜその圧力が発生しているかは、本人にも説明できない。</p>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <section id="chapter7">
+        <h2>第7章 関連文書との整合性</h2>
+
+        <h3>7.1 否定規定との整合</h3>
+
+        <p>layer2-layer3-relations.htmlにおける否定規定との整合を確認する。</p>
+
+        <table>
+            <tr>
+                <th>否定規定</th>
+                <th>本補論の記述</th>
+                <th>整合性</th>
+            </tr>
+            <tr>
+                <td>層3は層2を決定しない</td>
+                <td>圧力は応答を強制しない。応答パターンは層2のパラメータとアーキテクチャに依存</td>
+                <td>整合</td>
+            </tr>
+            <tr>
+                <td>層3は層2を生成しない</td>
+                <td>圧力は存在論的影響であり、層2の構造を生成しない</td>
+                <td>整合</td>
+            </tr>
+            <tr>
+                <td>層3は層2と因果関係を持たない</td>
+                <td>圧力は「要請」であり、因果的決定ではない。参照は層2の操作である</td>
+                <td>整合</td>
+            </tr>
+            <tr>
+                <td>層3は層2に作用しない</td>
+                <td>圧力は処理構造を変更しない。作用の定義（処理構造の変更）に該当しない</td>
+                <td>整合</td>
+            </tr>
+        </table>
+
+        <h3>7.2 境界定義補論との整合</h3>
+
+        <p>layer2-layer3-boundary-definitions.htmlとの整合を確認する。</p>
+
+        <table>
+            <tr>
+                <th>境界定義補論の記述</th>
+                <th>本補論の記述</th>
+                <th>関係</th>
+            </tr>
+            <tr>
+                <td>層3は外部化不可能（無限）</td>
+                <td>層3からの入力は「有限の形式に収まらない」</td>
+                <td>前提として継承</td>
+            </tr>
+            <tr>
+                <td>I/Fは外部化可能な断片のみを通過させる</td>
+                <td>写像変質はI/F通過時の情報損失として発生</td>
+                <td>拡張・具体化</td>
+            </tr>
+            <tr>
+                <td>参照は作用に含まれない</td>
+                <td>参照は操作的概念、圧力は存在論的概念として区分</td>
+                <td>拡張・精緻化</td>
+            </tr>
+        </table>
+
+        <h3>7.3 多重人格モデルとの整合</h3>
+
+        <p>multiple-personality-model.htmlとの整合を確認する。</p>
+
+        <table>
+            <tr>
+                <th>多重人格モデルの記述</th>
+                <th>本補論の記述</th>
+                <th>関係</th>
+            </tr>
+            <tr>
+                <td>人格モード＝層3クラスタ × 層2パラメータ</td>
+                <td>層2パラメータ体系を明示的に定義</td>
+                <td>補完</td>
+            </tr>
+            <tr>
+                <td>OS核は単一</td>
+                <td>アーキテクチャ類型は切り替え可能だが、基盤は単一</td>
+                <td>整合</td>
+            </tr>
+        </table>
+
+        <h3>7.4 本補論の位置づけ（総括）</h3>
+
+        <p>本補論は、以下の三層構造の第三層として機能する。</p>
+
+        <div class="diagram">
+<pre>
+layer2-layer3-relations.html
+    │ 責務：否定規定（何をしないか）
+    │
+    ↓ 補足
+layer2-layer3-boundary-definitions.html
+    │ 責務：用語定義（何を意味するか）
+    │
+    ↓ 拡張
+layer2-layer3-dynamics.html（本文書）
+    │ 責務：動的挙動（どのように作動するか）
+</pre>
+        </div>
+
+    </section>
+
+    <hr>
+
+    <footer>
+        <p><strong>文書情報</strong></p>
+        <table>
+            <tr>
+                <th>文書種別</th>
+                <td>技術補論（動的挙動記述）</td>
+            </tr>
+            <tr>
+                <th>対象</th>
+                <td>認知OSモデル仕様書群</td>
+            </tr>
+            <tr>
+                <th>責務</th>
+                <td>層2/層3間の動的挙動の記述</td>
+            </tr>
+            <tr>
+                <th>前提文書</th>
+                <td>layer2-layer3-relations.html, layer2-layer3-boundary-definitions.html</td>
+            </tr>
+        </table>
+    </footer>
+
+</body>
+
+</html>

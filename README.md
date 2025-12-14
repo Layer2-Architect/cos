@@ -1,3 +1,16 @@
+> [!IMPORTANT]
+> **【使用許可プロトコル / Permission Protocol】**
+>
+> 本リポジトリは「読み物」ではなく、あなたの認知プロセスに実装するための**「処理構造（OS）仕様書」**である。
+>
+> 以下の定義ファイルを読み、その構造的整合性を検証できた者のみが、
+> 自己の責任において本モデルを現実の問題解決に**適用（Execute）する資格**を持つ。
+>
+> * **対象外 (Exit Condition):** 共感や情緒的納得を求め、構造記述を不快に感じる場合、本モデルは機能しない。
+> * **対象者 (Entry Condition):** 構造を理解し、自らの意志で実装を決定する者。
+>
+> 構造が読解できたならば、あなたはすでに「使用者」である。直ちに使用を開始せよ。
+
 # Cognitive OS Model (cos)
 
 ## 本リポジトリの性質
@@ -75,4 +88,4 @@
 
 本モデルを引用、参照、あるいは本モデルに基づいた議論を行う場合は、以下の形式を推奨します。
 
-Layer2-Architect. (v1.0.0). Cognitive OS Model. https://github.com/Layer2-Architect/cos
+Layer2-Architect. (v1.0.1). Cognitive OS Model. https://github.com/Layer2-Architect/cos
